@@ -9,10 +9,10 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import Book, BookOrdered, Review
-from django_simple_paginator import constants
-from django_simple_paginator.converter import PageConverter, CursorPageConverter
-from django_simple_paginator.cursor import paginate_cursor_queryset, CursorPaginateMixin
-from django_simple_paginator.utils import paginate_queryset, get_model_attribute, get_order_key, url_encode_order_key, url_decode_order_key, get_order_by, invert_order_by, convert_to_order_by, convert_order_by_to_expressions, filter_by_order_key
+from django_universal_paginator import constants
+from django_universal_paginator.converter import PageConverter, CursorPageConverter
+from django_universal_paginator.cursor import paginate_cursor_queryset, CursorPaginateMixin
+from django_universal_paginator.utils import paginate_queryset, get_model_attribute, get_order_key, url_encode_order_key, url_decode_order_key, get_order_by, invert_order_by, convert_to_order_by, convert_order_by_to_expressions, filter_by_order_key
 
 
 class CursorPaginatedView(CursorPaginateMixin):
@@ -204,7 +204,7 @@ class TestUtils(TestCase):
 			books = get_books(['pk'], ['x']) # wrong value
 
 		# no nulls specified
-		with self.assertLogs('django_simple_paginator.utils'):
+		with self.assertLogs('django_universal_paginator.utils'):
 			get_books([F('rating').asc(), 'pk'], [None, 1])
 
 		# empty filter

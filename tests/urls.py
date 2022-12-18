@@ -2,7 +2,7 @@
 from django.urls import path, register_converter
 
 from .views import BookList, CursorBookList
-from django_simple_paginator.converter import PageConverter, CursorPageConverter
+from django_universal_paginator.converter import PageConverter, CursorPageConverter
 
 
 register_converter(PageConverter, 'page')

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.views.generic import ListView
-from django_simple_paginator.cursor import CursorPaginateMixin
+from django_universal_paginator.cursor import CursorPaginateMixin
 
 from .models import Book
 

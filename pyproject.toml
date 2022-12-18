@@ -1,5 +1,5 @@
 [project]
-name = "django_simple_paginator"
+name = "django_universal_paginator"
 description = "Simple pagination for django"
 readme = "README.rst"
 requires-python = ">=3.7"
@@ -17,10 +17,10 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/mireq/django-simple-paginator"
-documentation = "https://github.com/mireq/django-simple-paginator"
-repository = "https://github.com/mireq/django-simple-paginator"
-changelog = "https://github.com/mireq/django-simple-paginator/blob/master/CHANGELOG.md"
+homepage = "https://github.com/mireq/django-universal-paginator"
+documentation = "https://github.com/mireq/django-universal-paginator"
+repository = "https://github.com/mireq/django-universal-paginator"
+changelog = "https://github.com/mireq/django-universal-paginator/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
@@ -37,7 +37,7 @@ requires = ["setuptools", "setuptools-scm", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["django_simple_paginator"]
+packages = ["django_universal_paginator"]
 
 [tool.setuptools_scm]
 

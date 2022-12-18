@@ -3,7 +3,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
 
-INSTALLED_APPS = ['tests', 'django_simple_paginator']
+INSTALLED_APPS = ['tests', 'django_universal_paginator']
 SECRET_KEY = 'secret'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ROOT_URLCONF = 'tests.urls'
@@ -29,7 +29,7 @@ TEMPLATES = [
 		'APP_DIRS': True,
 		'OPTIONS': {
 			'context_processors': ['django.template.context_processors.request'],
-			'builtins': ['django_simple_paginator.templatetags.paginator_tags'],
+			'builtins': ['django_universal_paginator.templatetags.paginator_tags'],
 		},
 	},
 ]

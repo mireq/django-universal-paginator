@@ -14,7 +14,7 @@ INSTALLED_APPS = [
 	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
-	'django_simple_paginator',
+	'django_universal_paginator',
 ]
 
 MIDDLEWARE = [

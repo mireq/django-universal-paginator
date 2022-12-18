@@ -1,5 +1,5 @@
 sample_project/db.sqlite3
-/django_simple_paginator.egg-info
+/django_universal_paginator.egg-info
 .envrc
 *~
 *.pyc

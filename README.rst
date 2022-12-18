@@ -5,7 +5,7 @@ Simple pagination for django
 Install
 -------
 
-`pip install https://github.com/mireq/django-simple-paginator.git`
+`pip install https://github.com/mireq/django-universal-paginator.git`
 
 Usage
 -----
@@ -17,7 +17,7 @@ Settings
 
 	INSTALLED_APPS = (
 		# ...
-		'django_simple_paginator',
+		'django_universal_paginator',
 	)
 
 View
