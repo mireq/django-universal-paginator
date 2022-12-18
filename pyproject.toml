@@ -43,5 +43,5 @@ packages = ["django_universal_paginator"]
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.2"
+version = "1.0.0"
 tag_format = "$version"
