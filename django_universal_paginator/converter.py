@@ -26,7 +26,7 @@ class CursorPageConverter:
 	"""
 	Converts cursor page from / to paginated URL
 	"""
-	regex = r'(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?'
+	regex = r'(?:[^/]*/)?'
 
 	def to_python(self, value):
 		value = value.rstrip('/')
