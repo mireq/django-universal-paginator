@@ -14,4 +14,5 @@ urlpatterns = [
 	path('default/<page:page>', views.default_paginator_view, name='default_paginator'),
 	path('large/<page:page>', views.large_paginator_view, name='large_paginator'),
 	path('custom-template/<page:page>', views.custom_template_paginator_view, name='custom_template_paginator'),
+	path('cursor/<cursor_page:page>', views.cursor_list_view, name='cursor'),
 ]
