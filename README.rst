@@ -2,6 +2,8 @@
 Universal cursor and standard paginator for django
 ==================================================
 
+|codecov| |version| |downloads| |license|
+
 This package can render standard paginator and efficient cursor pagination.
 
 Cursor pagination needs ordered queryset which can be used as unique key.
@@ -92,3 +94,15 @@ Paginator template
 To override default paginator template create file `paginator/paginator.html` in
 directory with templates. Example `paginator.html` file is located in
 `sample_project/templates/paginator` directory.
+
+.. |codecov| image:: https://codecov.io/gh/mireq/django-universal-paginator/branch/master/graph/badge.svg?token=QGY5B5X0F3
+	:target: https://codecov.io/gh/mireq/django-universal-paginator
+
+.. |version| image:: https://badge.fury.io/py/django-universal-paginator-generator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
+
+.. |downloads| image:: https://img.shields.io/pypi/dw/django-universal-paginator-generator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
+
+.. |license| image:: https://img.shields.io/pypi/l/django-universal-paginator-generator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
