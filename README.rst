@@ -1,11 +1,15 @@
-============================
-Simple pagination for django
-============================
+==================================================
+Universal cursor and standard paginator for django
+==================================================
+
+This package can render standard paginator and efficient cursor pagination.
+
+Cursor pagination needs ordered queryset which can be used as unique key.
 
 Install
 -------
 
-`pip install https://github.com/mireq/django-universal-paginator.git`
+`pip install jango-universal-paginator`
 
 Usage
 -----
@@ -53,7 +57,33 @@ URLs
 .. code:: python
 
 	# urls.py
-	url(r'^object-list/(?:(?P<page>\d+)/)?$', ObjectList.as_view(), name='object_list'),
+
+	from django.urls import path, register_converter
+	from django_universal_paginator.converter import PageConverter, CursorPageConverter
+
+	register_converter(PageConverter, 'page')
+	register_converter(CursorPageConverter, 'cursor_page')
+
+	# standard
+	url(r'^object-list/<page:page>', ObjectList.as_view(), name='object_list'),
+	# or cursor
+	url(r'^cursor/<cursor_page:page>', ObjectList.as_view(), name='cursor_list'),
+
+
+Cursor pagination
+^^^^^^^^^^^^^^^^^
+
+To enable cursor paginator just extend ListView using
+`django_universal_paginator.CursorPaginateView` and ensure, that queryset order_by
+can be used to uniquely index object.
+
+.. code:: python
+
+	class List(CursorPaginateView, ListView):
+		queryset = Book.objects.order_by('pk')
+
+To use cursor pagination inside function based view, there is
+`django_universal_paginator.paginate_cursor_queryset` shortcut.
 
 
 Paginator template
