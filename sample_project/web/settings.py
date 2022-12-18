@@ -15,6 +15,7 @@ INSTALLED_APPS = [
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'django_universal_paginator',
+	'web',
 ]
 
 MIDDLEWARE = [
@@ -73,3 +74,5 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
