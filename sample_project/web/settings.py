@@ -34,6 +34,10 @@ TEMPLATES = [
 		'BACKEND': 'django.template.backends.django.DjangoTemplates',
 		'DIRS': [os.path.join(BASE_DIR, 'templates'),],
 		'OPTIONS': {
+			'builtins': [
+				'django_universal_paginator.templatetags.paginator_tags',
+				'django.templatetags.static',
+			],
 			'context_processors': [
 				#'django.template.context_processors.debug',
 				'django.template.context_processors.request',

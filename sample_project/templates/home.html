@@ -5,8 +5,8 @@
 
 {% block content %}
 	<ul>
-		<li><a href="{% url "default_paginator" %}">Default paginator</a></li>
-		<li><a href="{% url "large_paginator" %}">Large paginator</a></li>
-		<li><a href="{% url "custom_template_paginator" %}">Custom template paginator</a></li>
+		<li><a href="{% url "default_paginator" page=1 %}">Default paginator</a></li>
+		<li><a href="{% url "large_paginator" page=1 %}">Large paginator</a></li>
+		<li><a href="{% url "custom_template_paginator" page=1 %}">Custom template paginator</a></li>
 	</ul>
 {% endblock %}
