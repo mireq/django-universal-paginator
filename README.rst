@@ -137,25 +137,18 @@ If you are using function based views, you can use
 Cursor pagination
 ^^^^^^^^^^^^^^^^^
 
-To enable cursor paginator just extend ListView using
-`django_universal_paginator.CursorPaginateView` and ensure, that queryset order_by
-can be used to uniquely index object.
+To use cursor pagination, queryset must be correctly ordered (order key must be
+combination of keys which are unique across queryset).
 
 .. code:: python
 
+	# views.py
+	from django_universal_paginator.cursor import CursorPaginateMixin
+
 	class List(CursorPaginateView, ListView):
+		paginate_by = 10
 		queryset = Book.objects.order_by('pk')
 
-To use cursor pagination inside function based view, there is
-`django_universal_paginator.paginate_cursor_queryset` shortcut.
-
-
-Paginator template
-^^^^^^^^^^^^^^^^^^
-
-To override default paginator template create file `paginator/paginator.html` in
-directory with templates. Example `paginator.html` file is located in
-`sample_project/templates/paginator` directory.
 
 .. |codecov| image:: https://codecov.io/gh/mireq/django-universal-paginator/branch/master/graph/badge.svg?token=QGY5B5X0F3
 	:target: https://codecov.io/gh/mireq/django-universal-paginator
