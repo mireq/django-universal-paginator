@@ -44,38 +44,16 @@ Classical paginator support following settings:
 ``PAGINATOR_ON_ENDS``
 	Link count on start / end of list, default: 1
 ``PAGINATOR_TEMPLATE_NAME``
-	Default template name for paginator, default ``'paginator/paginator.html'``
-
-
-
-
+	Default template name for paginator, default: ``'paginator/paginator.html'``
 
 Usage
 -----
 
-Settings
-^^^^^^^^
-
-.. code:: python
-
-	INSTALLED_APPS = (
-		# ...
-		'django_universal_paginator',
-	)
-
-View
-^^^^
-
-.. code:: python
-
-	# views.py
-
-	class ObjectList(ListView):
-		paginate_by = 10
-		# model = ...
-
 Template
 ^^^^^^^^
+
+To use this library first add ``{% pagination %}`` to django template or
+``{{ pagination() }}`` to jinja2 template.
 
 .. code:: html
 
@@ -90,8 +68,15 @@ Template
 
 	<div class="pagination">{% pagination %}</div>
 
+To modify style look to `page.html
+<https://github.com/mireq/django-universal-paginator/blob/master/django_universal_paginator/templates/paginator/paginator.html>`.
+
 URLs
 ^^^^
+
+This package can be used without URL modification, but if you want clean URL
+patterns without GET parameters, like ``/object-list/3/``, you can use following
+code (example contains both methods - standard and cursor).
 
 .. code:: python
 
@@ -107,6 +92,18 @@ URLs
 	url(r'^object-list/<page:page>', ObjectList.as_view(), name='object_list'),
 	# or cursor
 	url(r'^cursor/<cursor_page:page>', ObjectList.as_view(), name='cursor_list'),
+
+
+View
+^^^^
+
+.. code:: python
+
+	# views.py
+
+	class ObjectList(ListView):
+		paginate_by = 10
+		# model = ...
 
 
 Cursor pagination
