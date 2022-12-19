@@ -1,17 +1,54 @@
-==================================================
-Universal cursor and standard paginator for django
-==================================================
+========================================
+Cursor and standard paginator for django
+========================================
 
 |codecov| |version| |downloads| |license|
 
-This package can render standard paginator and efficient cursor pagination.
+This package is used to create standard or cursor navigation for django.
 
-Cursor pagination needs ordered queryset which can be used as unique key.
+It has builtin templates, so you can use this library with minimal effort.
+Library can be used with `jinja2` templates. If you are using ``django_jinja``
+package, additional template tags are automatically registered to `jinja2`
+engine.
+
+If you are using cursor pagination, the queryset must be ordered with
+combination of data fields, which are unique across query.
+
+Cursor pagination supports checking for next / previous page presence without
+any additional queries. There is used only single query to select records, no
+additional queries to `count` checking or next / previous checking.
 
 Install
 -------
 
-`pip install jango-universal-paginator`
+.. code:: bash
+
+	pip install django-universal-paginator
+
+To ``INSTALLED_APPS`` add ``django_universal_paginator``.
+
+.. code:: python
+
+	INSTALLED_APPS = (
+		# ...
+		'django_universal_paginator',
+	)
+
+Settings
+--------
+
+Classical paginator support following settings:
+
+``PAGINATOR_ON_EACH_SIDE``
+	Count of links around current page, default: 3
+``PAGINATOR_ON_ENDS``
+	Link count on start / end of list, default: 1
+``PAGINATOR_TEMPLATE_NAME``
+	Default template name for paginator, default ``'paginator/paginator.html'``
+
+
+
+
 
 Usage
 -----
