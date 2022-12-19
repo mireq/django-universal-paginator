@@ -69,7 +69,7 @@ To use this library first add ``{% pagination %}`` to django template or
 	<div class="pagination">{% pagination %}</div>
 
 To modify style look to
-`page.html <https://github.com/mireq/django-universal-paginator/blob/master/django_universal_paginator/templates/paginator/paginator.html>`_.
+`paginator.html <https://github.com/mireq/django-universal-paginator/blob/master/django_universal_paginator/templates/paginator/paginator.html>`_.
 
 URLs
 ^^^^
@@ -94,8 +94,12 @@ code (example contains both methods - standard and cursor).
 	url(r'^cursor/<cursor_page:page>', ObjectList.as_view(), name='cursor_list'),
 
 
-View
-^^^^
+Classical navigation
+^^^^^^^^^^^^^^^^^^^^
+
+To use classical navigation, just add ``paginate_by`` attribute to class based
+list view.
+
 
 .. code:: python
 
@@ -104,6 +108,30 @@ View
 	class ObjectList(ListView):
 		paginate_by = 10
 		# model = ...
+
+If you are using function based views, you can use
+``django_universal_paginator.utils.paginate_queryset``.
+
+.. code:: python
+
+	# views.py
+	from django_universal_paginator.utils import paginate_queryset
+
+	def list_view(request):
+		queryset = Book.objects.order_by('pk')
+		paginate_by = 10
+		page = 1
+		paginator, page, queryset, is_paginated = self.paginate_queryset(queryset, page,
+		paginate_by)
+
+		context = {
+			"paginator": paginator,
+			"page_obj": page,
+			"is_paginated": is_paginated,
+			"object_list": queryset,
+		}
+
+		reutrn render_to_string("list.html", context)
 
 
 Cursor pagination
