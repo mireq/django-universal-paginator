@@ -98,11 +98,11 @@ directory with templates. Example `paginator.html` file is located in
 .. |codecov| image:: https://codecov.io/gh/mireq/django-universal-paginator/branch/master/graph/badge.svg?token=QGY5B5X0F3
 	:target: https://codecov.io/gh/mireq/django-universal-paginator
 
-.. |version| image:: https://badge.fury.io/py/django-universal-paginator-generator.svg
-	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
+.. |version| image:: https://badge.fury.io/py/django-universal-paginator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator/
 
-.. |downloads| image:: https://img.shields.io/pypi/dw/django-universal-paginator-generator.svg
-	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
+.. |downloads| image:: https://img.shields.io/pypi/dw/django-universal-paginator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator/
 
-.. |license| image:: https://img.shields.io/pypi/l/django-universal-paginator-generator.svg
-	:target: https://pypi.python.org/pypi/django-universal-paginator-generator/
+.. |license| image:: https://img.shields.io/pypi/l/django-universal-paginator.svg
+	:target: https://pypi.python.org/pypi/django-universal-paginator/
