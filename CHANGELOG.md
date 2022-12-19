@@ -1,3 +1,10 @@
+## 1.0.1 (2022-12-19)
+
+### Fix
+
+- Fixed link to page.html
+- Replaced wrong links
+
 ## 1.0.0 (2022-12-18)
 
 ### Feat
