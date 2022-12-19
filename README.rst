@@ -68,8 +68,8 @@ To use this library first add ``{% pagination %}`` to django template or
 
 	<div class="pagination">{% pagination %}</div>
 
-To modify style look to `page.html
-<https://github.com/mireq/django-universal-paginator/blob/master/django_universal_paginator/templates/paginator/paginator.html>`.
+To modify style look to
+`page.html <https://github.com/mireq/django-universal-paginator/blob/master/django_universal_paginator/templates/paginator/paginator.html>`_.
 
 URLs
 ^^^^
