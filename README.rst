@@ -143,9 +143,10 @@ combination of keys which are unique across queryset).
 .. code:: python
 
 	# views.py
+	from django.views.generic import ListView
 	from django_universal_paginator.cursor import CursorPaginateMixin
 
-	class List(CursorPaginateView, ListView):
+	class List(CursorPaginateMixin, ListView):
 		paginate_by = 10
 		queryset = Book.objects.order_by('pk')
 
