@@ -50,7 +50,7 @@ class IteratorWrapper(object):
 
 		if start_key is not None:
 			# first item handling (used to check previous page existence)
-			if cache and self.paginator.get_order_key(cache[0]) == start_key.values:
+			if cache and utils.values_to_order_key(self.paginator.get_order_key(cache[0])) == start_key.values:
 				if start_key.direction == constants.KEY_BACK:
 					self.page.next_page_item = cache.pop(0)
 				else:

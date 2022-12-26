@@ -63,13 +63,19 @@ def url_decode_order_key(order_key):
 	return tuple(json.loads(urlsafe_base64_decode(order_key).decode('utf-8')))
 
 
+def values_to_order_key(value):
+	"""
+	Convert values to serializable format
+	"""
+	return tuple(v.isoformat() if isinstance(v, datetime.datetime) else v for v in value)
+
+
 def url_encode_order_key(value):
 	"""
 	Decode list of order keys from URL string
 	"""
 	# prevent microsecond clipping
-	value = [v.isoformat() if isinstance(v, datetime.datetime) else v for v in value]
-	return urlsafe_base64_encode(json.dumps(value, cls=DjangoJSONEncoder).encode('utf-8'))
+	return urlsafe_base64_encode(json.dumps(values_to_order_key(value), cls=DjangoJSONEncoder).encode('utf-8'))
 
 
 def get_order_by(qs):
