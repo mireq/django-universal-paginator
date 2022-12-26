@@ -1,3 +1,10 @@
+## 1.0.2 (2022-12-26)
+
+### Fix
+
+- Fixed comparing to date fields
+- Suppress setuptools warnings
+
 ## 1.0.1 (2022-12-19)
 
 ### Fix
