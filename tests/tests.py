@@ -142,7 +142,6 @@ class TestUtils(TestCase):
 		# datetime
 		order_key = (timezone.now(),)
 		processed_order_key = url_decode_order_key(url_encode_order_key(order_key))
-		processed_order_key = (datetime.fromisoformat(processed_order_key[0]),)
 		self.assertEqual(order_key, processed_order_key)
 
 	def test_invert_order_by(self):

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 import logging
 import struct
 from copy import deepcopy
@@ -8,7 +7,6 @@ from decimal import Decimal as D
 from typing import Union
 
 from django.core.paginator import InvalidPage, Paginator
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Case, When, Value as V, Q, F
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy
@@ -323,15 +321,7 @@ def url_decode_order_key(order_key):
 	"""
 	Encode list of order keys to URL string
 	"""
-	#return tuple(deserialize_values(urlsafe_base64_decode(order_key)))
-	return tuple(json.loads(urlsafe_base64_decode(order_key).decode('utf-8')))
-
-
-def values_to_order_key(value):
-	"""
-	Convert values to serializable format
-	"""
-	return tuple(v.isoformat() if isinstance(v, datetime) else v for v in value)
+	return tuple(deserialize_values(urlsafe_base64_decode(order_key)))
 
 
 def url_encode_order_key(value):
@@ -339,8 +329,7 @@ def url_encode_order_key(value):
 	Decode list of order keys from URL string
 	"""
 	# prevent microsecond clipping
-	#return urlsafe_base64_encode(serialize_values(value))
-	return urlsafe_base64_encode(json.dumps(values_to_order_key(value), cls=DjangoJSONEncoder).encode('utf-8'))
+	return urlsafe_base64_encode(serialize_values(value))
 
 
 def get_order_by(qs):
