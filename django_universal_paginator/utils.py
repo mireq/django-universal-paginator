@@ -4,6 +4,7 @@ import json
 import logging
 import struct
 from copy import deepcopy
+from datetime import time
 from decimal import Decimal as D
 from typing import Union
 
@@ -128,7 +129,7 @@ def serialize_long_number(val: Union[int, D]) -> bytes:
 		return struct.pack('B', 255) + struct.pack('!H', len(val) - 255) + val
 
 
-def deserialize_long_number_type(val: bytes, number_type: type) -> Union[int, D]:
+def deserialize_long_number_type(val: bytes, number_type: type) -> tuple:
 	header_size = 1
 	length = val[0]
 	if length == 255:
@@ -138,12 +139,41 @@ def deserialize_long_number_type(val: bytes, number_type: type) -> Union[int, D]
 	return (length + header_size, num)
 
 
-def deserialize_long_number(val: bytes) -> int:
+def deserialize_long_number(val: bytes) -> tuple:
 	return deserialize_long_number_type(val, int)
 
 
 def deserialize_long_decimal(val: bytes) -> D:
 	return deserialize_long_number_type(val, D)
+
+
+def serialize_time(val: time) -> bytes:
+	num = val.second + val.minute * 60 + val.hour * 3600
+	if val.microsecond == 0:
+		num = struct.pack('!I', num)
+		return num[-3:] # only 3 bytes needed
+	else:
+		num = num * 1000000 + val.microsecond + (2 ** 39)
+		num = struct.pack('!Q', num)
+		return num[-5:] # only 3 bytes needed
+
+
+def deserialize_time(val: bytes) -> tuple:
+	first = val[0]
+	microseconds = 0
+	if first < 128: # without microseconds
+		length = 3
+		val = b'\x00' + val[:3]
+		num = struct.unpack('!I', val)[0]
+	else:
+		length = 5
+		val = b'\x00\x00\x00' + val[:5]
+		num = struct.unpack('!Q', val)[0]
+		num &= 0x7fffffffff
+		microseconds = num % 1000000
+		num = num // 1000000
+	val = time(num // 3600, (num // 60) % 60, num % 60, microseconds)
+	return (length, val)
 
 
 VALUE_SERIALIZERS = [
@@ -173,6 +203,7 @@ VALUE_SERIALIZERS = [
 	(lambda v: isinstance(v, D) and v.to_integral_value() == v, serialize_long_number, deserialize_long_decimal),
 	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
 	(lambda v: isinstance(v, D), serialize_long_number, deserialize_long_decimal),
+	(lambda v: isinstance(v, time), serialize_time, deserialize_time),
 ]
 """
 List of (check function, serialize function, deserialize function)
@@ -252,6 +283,7 @@ def url_decode_order_key(order_key):
 	"""
 	Encode list of order keys to URL string
 	"""
+	#return tuple(deserialize_values(urlsafe_base64_decode(order_key)))
 	return tuple(json.loads(urlsafe_base64_decode(order_key).decode('utf-8')))
 
 
@@ -267,6 +299,7 @@ def url_encode_order_key(value):
 	Decode list of order keys from URL string
 	"""
 	# prevent microsecond clipping
+	#return urlsafe_base64_encode(serialize_values(value))
 	return urlsafe_base64_encode(json.dumps(values_to_order_key(value), cls=DjangoJSONEncoder).encode('utf-8'))
 
 
