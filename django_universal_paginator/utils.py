@@ -21,10 +21,48 @@ from . import constants
 logger = logging.getLogger(__name__)
 
 
+class SerializationError(RuntimeError):
+	pass
+
+
+def is_short_string(v):
+	return isinstance(v, str) and len(v) < 256
+
+
+def serialize_short_string(v: str) -> bytes:
+	return struct.pack('B', len(v)) + v.encode('utf-8')
+
+
+def deserialize_short_string(v: bytes) -> tuple:
+	length = v[0]
+	text = v[1:].decode('utf-8')
+	return length + 1, text
+
+
+def is_long_string(v):
+	if not isinstance(v, str):
+		return False
+	if len(v) > (65535+256):
+		raise SerializationError("String value too long")
+	return True
+
+
+def serialize_long_string(v: str) -> bytes:
+	length = len(v) - 256
+	return struct.pack('H', length) + v.encode('utf-8')
+
+
+def deserialize_long_string(v: bytes) -> tuple:
+	length = struct.unpack('H', v[:2])[0] + 256
+	return length + 2, v[2:].decode('utf-8')
+
+
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
 	(lambda v: v is False, lambda v: b'', lambda v: (0, False)),
+	(is_short_string, serialize_short_string, deserialize_short_string),
+	(is_long_string, serialize_long_string, deserialize_long_string),
 ]
 """
 List of (check function, serialize function, deserialize function)
