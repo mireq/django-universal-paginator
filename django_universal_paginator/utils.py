@@ -114,6 +114,26 @@ def number_serializer(size_idx):
 	return (match, serialize, deserialize)
 
 
+def serialize_long_number(val: int) -> bytes:
+	val = str(val).encode('utf-8')
+	if len(val) > (65536 + 255 - 2):
+		raise SerializationError("Number too large")
+	if len(val) < 255:
+		return struct.pack('B', len(val)) + val
+	else:
+		return struct.pack('B!H', 255, len(val) - 255) + val
+
+
+def deserialize_long_number(val: bytes) -> int:
+	header_size = 1
+	length = val[0]
+	if length == 255:
+		length = struct.unpack('!H', val[1:3])[0] + 255
+		header_size = 3
+	num = int(val[header_size:header_size+length])
+	return (length + header_size, num)
+
+
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
@@ -129,6 +149,7 @@ VALUE_SERIALIZERS = [
 	number_serializer(-3), # four bytes negative
 	number_serializer(4), # eight bytes positive
 	number_serializer(-4), # eight bytes negative
+	(lambda v: isinstance(v, int), serialize_long_number, deserialize_long_number),
 	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
 ]
 """

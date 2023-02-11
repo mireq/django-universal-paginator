@@ -473,8 +473,8 @@ class TestSerializer(TestCase):
 			(256 + 65536 + 4294967296 + 18446744073709551616 - 1, 8), # eight bytes, max value
 			(-256 - 65536 - 4294967296 - 1, 8), # eight bytes, min negative value
 			(-256 - 65536 - 4294967296 - 18446744073709551616, 8), # eight bytes, max negative value
-			(256 + 65536 + 4294967296 + 18446744073709551616, 20), # positive, as string
-			(-256 - 65536 - 4294967296 - 18446744073709551616 - 1, 21), # negative, as string
+			(256 + 65536 + 4294967296 + 18446744073709551616, 21), # positive, as string
+			(-256 - 65536 - 4294967296 - 18446744073709551616 - 1, 22), # negative, as string
 		]
 
 		for expected_num, expected_size in num_size_tests:
@@ -483,13 +483,6 @@ class TestSerializer(TestCase):
 			deserialized = deserialize_values(val)
 			self.assertEqual(2 * (expected_size + 1), len(val))
 			self.assertEqual(data, deserialized)
-
-		# string as fallback
-		data = [18446744078004584704]
-		val = serialize_values(data)
-		deserialized = deserialize_values(val)
-		self.assertEqual(21, len(val))
-		self.assertEqual([str(data[0])], deserialized)
 
 	def test_serialize_float(self):
 		data = [0.1]
