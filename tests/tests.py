@@ -12,7 +12,7 @@ from .models import Book, BookOrdered, Review
 from django_universal_paginator import constants
 from django_universal_paginator.converter import PageConverter, CursorPageConverter
 from django_universal_paginator.cursor import paginate_cursor_queryset, CursorPaginateMixin
-from django_universal_paginator.utils import paginate_queryset, get_model_attribute, get_order_key, url_encode_order_key, url_decode_order_key, get_order_by, invert_order_by, convert_to_order_by, convert_order_by_to_expressions, filter_by_order_key
+from django_universal_paginator.utils import paginate_queryset, get_model_attribute, get_order_key, url_encode_order_key, url_decode_order_key, get_order_by, invert_order_by, convert_to_order_by, convert_order_by_to_expressions, filter_by_order_key, serialize_value, serialize_values
 
 
 class CursorPaginatedView(CursorPaginateMixin):
@@ -387,3 +387,14 @@ class TestTemplates(TestCase):
 		url = reverse('cursor_page', kwargs={'page': 1})
 		response = self.client.get(url)
 		self.assertNotContains(response, '/page/3/')
+
+
+class TestSerializer(TestCase):
+	def test_serialize_none(self):
+		val = serialize_value(None)
+		# use single byte for None representation
+		self.assertEqual(1, len(val))
+
+		# concat two None values
+		val = serialize_values([None, None])
+		self.assertEqual(2, len(val))

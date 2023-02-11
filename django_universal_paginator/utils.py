@@ -2,6 +2,7 @@
 import datetime
 import json
 import logging
+import struct
 from copy import deepcopy
 
 from django.db.models import Case, When, Value as V
@@ -18,6 +19,14 @@ from . import constants
 
 
 logger = logging.getLogger(__name__)
+
+
+VALUE_SERIALIZERS = [
+	(lambda v: v is None, lambda v: b'', lambda v: None),
+]
+"""
+List of (check function, serialize function, deserialize function)
+"""
 
 
 def paginate_queryset(queryset, page, page_size):
@@ -55,6 +64,18 @@ def get_order_key(obj, order_by):
 		get_model_attribute(obj, f.expression.name if isinstance(f, OrderBy) else f.lstrip('-'))
 		for f in order_by
 	)
+
+
+def serialize_value(value):
+	for i, serializer in enumerate(VALUE_SERIALIZERS):
+		checker, serializer, __ = serializer
+		if checker(value):
+			return struct.pack('B', i) + serializer(value)
+
+
+
+def serialize_values(values):
+	return b''.join(serialize_value(value) for value in values)
 
 
 def url_decode_order_key(order_key):
