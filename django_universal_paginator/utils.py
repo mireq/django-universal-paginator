@@ -127,6 +127,7 @@ def serialize_value(value) -> bytes:
 		checker, serializer, __ = serializer
 		if checker(value):
 			return struct.pack('B', i) + serializer(value)
+	return serialize_value(str(value))
 
 
 def serialize_values(values: list) -> bytes:

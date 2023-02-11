@@ -437,3 +437,14 @@ class TestSerializer(TestCase):
 		text = b'x' * 65536 # too long
 		with self.assertRaises(SerializationError):
 			serialize_values([text])
+
+	def test_serialize_unknown_object(self):
+		text = 'hello'
+		class UnknownObject(object):
+			def __str__(self):
+				return text
+
+		# perform only string conversion
+		val = serialize_values([UnknownObject()])
+		deserialized = deserialize_values(val)
+		self.assertEqual([text], deserialized)
