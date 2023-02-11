@@ -116,12 +116,10 @@ def number_serializer(size_idx):
 
 def serialize_long_number(val: int) -> bytes:
 	val = str(val).encode('utf-8')
-	if len(val) > (65536 + 255 - 2):
-		raise SerializationError("Number too large")
 	if len(val) < 255:
 		return struct.pack('B', len(val)) + val
 	else:
-		return struct.pack('B!H', 255, len(val) - 255) + val
+		return struct.pack('B', 255) + struct.pack('!H', len(val) - 255) + val
 
 
 def deserialize_long_number(val: bytes) -> int:

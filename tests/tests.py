@@ -475,6 +475,7 @@ class TestSerializer(TestCase):
 			(-256 - 65536 - 4294967296 - 18446744073709551616, 8), # eight bytes, max negative value
 			(256 + 65536 + 4294967296 + 18446744073709551616, 21), # positive, as string
 			(-256 - 65536 - 4294967296 - 18446744073709551616 - 1, 22), # negative, as string
+			(int('9' * 255), 258), # really big number
 		]
 
 		for expected_num, expected_size in num_size_tests:
