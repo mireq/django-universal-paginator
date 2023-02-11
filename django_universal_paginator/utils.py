@@ -4,11 +4,12 @@ import json
 import logging
 import struct
 from copy import deepcopy
+from decimal import Decimal as D
+from typing import Union
 
-from django.db.models import Case, When, Value as V
 from django.core.paginator import InvalidPage, Paginator
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Q, F
+from django.db.models import Case, When, Value as V, Q, F
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy
 from django.http import Http404
@@ -81,7 +82,7 @@ NUMBER_MAX_VALUES = [sum(256**s for s in NUMBER_SIZES[0:size+1]) for size in ran
 NUMBER_SUBTRACTS = [0] + NUMBER_MAX_VALUES[:-1]
 
 
-def number_serializer(size_idx):
+def number_serializer(size_idx, number_type):
 	negative = size_idx < 0
 	size_idx = abs(size_idx) - 1
 	size = NUMBER_SIZES[size_idx]
@@ -93,7 +94,9 @@ def number_serializer(size_idx):
 		max_val += 1
 
 	def match(val):
-		if not isinstance(val, int):
+		if not isinstance(val, number_type):
+			return False
+		if isinstance(val, D) and val.to_integral_value() != val:
 			return False
 		if negative:
 			val = -val
@@ -103,33 +106,44 @@ def number_serializer(size_idx):
 		val = val
 		if negative:
 			val = -val - 1
-		return struct.pack(NUMBER_FORMATS[size_idx], val - subtract)
+		val = val - subtract
+		if isinstance(val, D):
+			val = int(val.to_integral_value())
+		return struct.pack(NUMBER_FORMATS[size_idx], val)
 
 	def deserialize(val):
 		val = struct.unpack(NUMBER_FORMATS[size_idx], val[:size])[0] + subtract
 		if negative:
 			val = -val - 1
-		return size, val
+		return size, number_type(val)
 
 	return (match, serialize, deserialize)
 
 
-def serialize_long_number(val: int) -> bytes:
-	val = str(val).encode('utf-8')
+def serialize_long_number(val: Union[int, D]) -> bytes:
+	val = str(int(val)).encode('utf-8')
 	if len(val) < 255:
 		return struct.pack('B', len(val)) + val
 	else:
 		return struct.pack('B', 255) + struct.pack('!H', len(val) - 255) + val
 
 
-def deserialize_long_number(val: bytes) -> int:
+def deserialize_long_number_type(val: bytes, number_type: type) -> Union[int, D]:
 	header_size = 1
 	length = val[0]
 	if length == 255:
 		length = struct.unpack('!H', val[1:3])[0] + 255
 		header_size = 3
-	num = int(val[header_size:header_size+length])
+	num = number_type(val[header_size:header_size+length].decode('utf-8'))
 	return (length + header_size, num)
+
+
+def deserialize_long_number(val: bytes) -> int:
+	return deserialize_long_number_type(val, int)
+
+
+def deserialize_long_decimal(val: bytes) -> D:
+	return deserialize_long_number_type(val, D)
 
 
 VALUE_SERIALIZERS = [
@@ -139,15 +153,24 @@ VALUE_SERIALIZERS = [
 	(is_short_string, serialize_short_string, deserialize_short_string),
 	(is_long_string, serialize_long_string, deserialize_long_string),
 	(is_bytes, serialize_bytes, deserialize_bytes),
-	number_serializer(1), # one_byte
-	number_serializer(-1), # one_byte negative
-	number_serializer(2), # two bytes positive
-	number_serializer(-2), # two bytes negative
-	number_serializer(3), # four bytes positive
-	number_serializer(-3), # four bytes negative
-	number_serializer(4), # eight bytes positive
-	number_serializer(-4), # eight bytes negative
+	number_serializer(1, int), # one_byte
+	number_serializer(-1, int), # one_byte negative
+	number_serializer(2, int), # two bytes positive
+	number_serializer(-2, int), # two bytes negative
+	number_serializer(3, int), # four bytes positive
+	number_serializer(-3, int), # four bytes negative
+	number_serializer(4, int), # eight bytes positive
+	number_serializer(-4, int), # eight bytes negative
 	(lambda v: isinstance(v, int), serialize_long_number, deserialize_long_number),
+	number_serializer(1, D), # one_byte
+	number_serializer(-1, D), # one_byte negative
+	number_serializer(2, D), # two bytes positive
+	number_serializer(-2, D), # two bytes negative
+	number_serializer(3, D), # four bytes positive
+	number_serializer(-3, D), # four bytes negative
+	number_serializer(4, D), # eight bytes positive
+	number_serializer(-4, D), # eight bytes negative
+	(lambda v: isinstance(v, D) and v.to_integral_value() == v, serialize_long_number, deserialize_long_decimal),
 	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
 ]
 """

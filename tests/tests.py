@@ -479,11 +479,11 @@ class TestSerializer(TestCase):
 		]
 
 		for expected_num, expected_size in num_size_tests:
-			data = [expected_num, expected_num]
+			data = [expected_num, D(expected_num)]
 			val = serialize_values(data)
 			deserialized = deserialize_values(val)
-			self.assertEqual(2 * (expected_size + 1), len(val))
 			self.assertEqual(data, deserialized)
+			self.assertEqual(2 * (expected_size + 1), len(val))
 
 	def test_serialize_float(self):
 		data = [0.1]
