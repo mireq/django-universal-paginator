@@ -7,6 +7,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from decimal import Decimal as D
 
 from .models import Book, BookOrdered, Review
 from django_universal_paginator import constants
@@ -481,8 +482,6 @@ class TestSerializer(TestCase):
 			val = serialize_values(data)
 			deserialized = deserialize_values(val)
 			self.assertEqual(2 * (expected_size + 1), len(val))
-			if expected_size >= 20: # string comparison
-				data = [str(v) for v in data]
 			self.assertEqual(data, deserialized)
 
 		# string as fallback
