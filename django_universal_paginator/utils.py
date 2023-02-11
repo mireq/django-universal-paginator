@@ -49,11 +49,11 @@ def is_long_string(v) -> bool:
 
 def serialize_long_string(v: str) -> bytes:
 	length = len(v) - 256
-	return struct.pack('H', length) + v.encode('utf-8')
+	return struct.pack('!H', length) + v.encode('utf-8')
 
 
 def deserialize_long_string(v: bytes) -> tuple:
-	length = struct.unpack('H', v[:2])[0] + 256
+	length = struct.unpack('!H', v[:2])[0] + 256
 	return length + 2, v[2:].decode('utf-8')
 
 
@@ -64,11 +64,11 @@ def is_bytes(v) -> bool:
 def serialize_bytes(v: bytes) -> bytes:
 	if len(v) > 65535:
 		raise SerializationError("Bytes value too long")
-	return struct.pack('H', len(v)) + v
+	return struct.pack('!H', len(v)) + v
 
 
 def deserialize_bytes(v: bytes) -> tuple:
-	length = struct.unpack('H', v[:2])[0]
+	length = struct.unpack('!H', v[:2])[0]
 	return length + 2, v[2:]
 
 
