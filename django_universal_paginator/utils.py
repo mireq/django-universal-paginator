@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 VALUE_SERIALIZERS = [
-	(lambda v: v is None, lambda v: b'', lambda v: None),
+	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 ]
 """
 List of (check function, serialize function, deserialize function)
@@ -66,16 +66,26 @@ def get_order_key(obj, order_by):
 	)
 
 
-def serialize_value(value):
+def serialize_value(value) -> bytes:
 	for i, serializer in enumerate(VALUE_SERIALIZERS):
 		checker, serializer, __ = serializer
 		if checker(value):
 			return struct.pack('B', i) + serializer(value)
 
 
-
-def serialize_values(values):
+def serialize_values(values: list) -> bytes:
 	return b''.join(serialize_value(value) for value in values)
+
+
+def deserialize_values(data: bytes) -> list:
+	values = []
+	while data:
+		data_type, data = data[0], data[1:]
+		consumed, value = VALUE_SERIALIZERS[data_type][2](data)
+		if consumed:
+			data = data[consumed:]
+		values.append(value)
+	return values
 
 
 def url_decode_order_key(order_key):
