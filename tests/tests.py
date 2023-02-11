@@ -411,37 +411,24 @@ class TestSerializer(TestCase):
 		self.assertEqual(value_list, deserialized)
 
 	def test_serialize_text(self):
-		text = 'hello 😼'
-		val = serialize_values([text])
-		deserialized = deserialize_values(val)
-		self.assertEqual(len(text.encode('utf-8')) + 1, len(val))
-		self.assertEqual([text], deserialized)
+		texts = [
+			('', 0), # zero size
+			('hello 😼', len('hello 😼'.encode('utf-8'))), # unicode
+			('x' * 63, 63), # max short size
+			('x' * 64, 65), # second byte to specify size
+			('x' * (64 + 256 - 1), 64 + 256), # max length with single addiional byte
+			('x' * (64 + 256), 64 + 256 + 2), # two bytes required for size
+			('x' * (64 + 256 + 65536 - 1), 64 + 256 + 65536 + 1), # maximum size
+		]
 
-		text = 'x' * 63 # one byte for size enough
-		val = serialize_values([text])
-		deserialized = deserialize_values(val)
-		self.assertEqual(len(text) + 1, len(val))
-		self.assertEqual([text], deserialized)
+		for expected_text, expected_size in texts:
+			val = serialize_values([expected_text, expected_text])
+			size = len(val) // 2 - 1
+			deserialized = deserialize_values(val)
+			self.assertEqual([expected_text, expected_text], deserialized)
+			self.assertEqual(expected_size, size)
 
-		text = 'x' * 64 # this needs second byte for size
-		val = serialize_values([text])
-		deserialized = deserialize_values(val)
-		self.assertEqual(len(text) + 2, len(val))
-		self.assertEqual([text], deserialized)
-
-		text = 'x' * (63 + 256) # max for two bytes
-		val = serialize_values([text])
-		deserialized = deserialize_values(val)
-		self.assertEqual(len(text) + 2, len(val))
-		self.assertEqual([text], deserialized)
-
-		text = 'x' * 256
-		val = serialize_values([text])
-		deserialized = deserialize_values(val)
-		self.assertEqual(len(text) + 2, len(val))
-		self.assertEqual([text], deserialized)
-
-		text = 'x' * (65536 + 320) # too long
+		text = 'x' * (64 + 256 + 65536) # too long
 		with self.assertRaises(SerializationError):
 			serialize_values([text])
 
