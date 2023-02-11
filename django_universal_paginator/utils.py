@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-import datetime
 import json
 import logging
 import struct
 from copy import deepcopy
-from datetime import time
+from datetime import time, date, datetime
 from decimal import Decimal as D
 from typing import Union
 
@@ -201,9 +200,10 @@ VALUE_SERIALIZERS = [
 	number_serializer(4, D), # eight bytes positive
 	number_serializer(-4, D), # eight bytes negative
 	(lambda v: isinstance(v, D) and v.to_integral_value() == v, serialize_long_number, deserialize_long_decimal),
-	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
+	(lambda v: isinstance(v, float), lambda v: struct.pack('!d', v), lambda v: (8, struct.unpack('!d', v[:8])[0])),
 	(lambda v: isinstance(v, D), serialize_long_number, deserialize_long_decimal),
 	(lambda v: isinstance(v, time), serialize_time, deserialize_time),
+	(lambda v: isinstance(v, date), lambda v: struct.pack('!I', v.toordinal() + 1721424), lambda v: (4, date.fromordinal(struct.unpack('!I', v[:4])[0] - 1721424))),
 ]
 """
 List of (check function, serialize function, deserialize function)
@@ -291,7 +291,7 @@ def values_to_order_key(value):
 	"""
 	Convert values to serializable format
 	"""
-	return tuple(v.isoformat() if isinstance(v, datetime.datetime) else v for v in value)
+	return tuple(v.isoformat() if isinstance(v, datetime) else v for v in value)
 
 
 def url_encode_order_key(value):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 from django.core.paginator import InvalidPage
 from django.db.models import F
@@ -505,3 +505,10 @@ class TestSerializer(TestCase):
 		deserialized = deserialize_values(val)
 		self.assertEqual(data, deserialized)
 		self.assertEqual(14, len(val))
+
+	def test_serialize_date(self):
+		data = [date(2020, 1, 1), date(1960, 12, 31)]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(data, deserialized)
+		self.assertEqual(10, len(val))
