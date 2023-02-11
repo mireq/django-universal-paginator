@@ -121,7 +121,7 @@ def number_serializer(size_idx, number_type):
 
 
 def serialize_long_number(val: Union[int, D]) -> bytes:
-	val = str(int(val)).encode('utf-8')
+	val = str(val).encode('utf-8')
 	if len(val) < 255:
 		return struct.pack('B', len(val)) + val
 	else:
@@ -172,6 +172,7 @@ VALUE_SERIALIZERS = [
 	number_serializer(-4, D), # eight bytes negative
 	(lambda v: isinstance(v, D) and v.to_integral_value() == v, serialize_long_number, deserialize_long_decimal),
 	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
+	(lambda v: isinstance(v, D), serialize_long_number, deserialize_long_decimal),
 ]
 """
 List of (check function, serialize function, deserialize function)

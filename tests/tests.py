@@ -491,3 +491,10 @@ class TestSerializer(TestCase):
 		deserialized = deserialize_values(val)
 		self.assertEqual(9, len(val))
 		self.assertEqual(data, deserialized)
+
+	def test_serialize_decimal(self):
+		data = [D('1.5'), D('2.5')]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(10, len(val))
+		self.assertEqual(data, deserialized)
