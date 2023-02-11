@@ -512,3 +512,15 @@ class TestSerializer(TestCase):
 		deserialized = deserialize_values(val)
 		self.assertEqual(data, deserialized)
 		self.assertEqual(10, len(val))
+
+	def test_serialize_datetime(self):
+		data = [
+			datetime(2020, 1, 1, 1, 2, 3), # naive without microsecond
+			datetime(1960, 12, 31, 23, 59, 59, tzinfo=timezone.utc), # localized without microsecond
+			datetime(2020, 1, 1, 1, 2, 3, 999999), # naive with microsecond
+			datetime(1960, 12, 31, 23, 59, 59, 999999, tzinfo=timezone.utc), # localized with microsecond
+		]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(data, deserialized)
+		self.assertEqual(44, len(val))

@@ -3,7 +3,7 @@ import json
 import logging
 import struct
 from copy import deepcopy
-from datetime import time, date, datetime
+from datetime import time, date, datetime, timezone
 from decimal import Decimal as D
 from typing import Union
 
@@ -175,6 +175,42 @@ def deserialize_time(val: bytes) -> tuple:
 	return (length, val)
 
 
+def date_serializer(use_timezone: bool, use_microsecond: bool) -> tuple:
+	def match(value: datetime) -> bool:
+		if not isinstance(value, datetime):
+			return False
+		has_timezone = value.tzinfo is not None
+		has_microsecond = value.microsecond != 0
+		return has_timezone == use_timezone and has_microsecond == use_microsecond
+
+	def serialize(val: datetime) -> bytes:
+		if val.tzinfo:
+			val = val.astimezone(timezone.utc)
+
+		timestamp = (val.date().toordinal() - 719163) * 86400
+		timestamp += val.time().hour * 3600 + val.time().minute * 60 + val.time().second
+
+		julian_timestamp = timestamp + 210866760000
+		data = struct.pack('!Q', julian_timestamp)
+		if use_microsecond:
+			data += struct.pack('!I', val.microsecond)
+
+		return data
+
+	def deserialize(val: bytes) -> tuple:
+		timestamp = struct.unpack('!Q', val[0:8])[0] - 210866760000
+		value = datetime.utcfromtimestamp(timestamp)
+		if use_timezone:
+			value = value.replace(tzinfo=timezone.utc)
+		if use_microsecond:
+			value = value.replace(microsecond=struct.unpack('!I', val[8:12])[0])
+
+		return (12 if use_microsecond else 8, value)
+
+	return (match, serialize, deserialize)
+
+
+
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
@@ -202,8 +238,12 @@ VALUE_SERIALIZERS = [
 	(lambda v: isinstance(v, D) and v.to_integral_value() == v, serialize_long_number, deserialize_long_decimal),
 	(lambda v: isinstance(v, float), lambda v: struct.pack('!d', v), lambda v: (8, struct.unpack('!d', v[:8])[0])),
 	(lambda v: isinstance(v, D), serialize_long_number, deserialize_long_decimal),
+	date_serializer(use_timezone=False, use_microsecond=False),
+	date_serializer(use_timezone=False, use_microsecond=True),
+	date_serializer(use_timezone=True, use_microsecond=False),
+	date_serializer(use_timezone=True, use_microsecond=True),
 	(lambda v: isinstance(v, time), serialize_time, deserialize_time),
-	(lambda v: isinstance(v, date), lambda v: struct.pack('!I', v.toordinal() + 1721424), lambda v: (4, date.fromordinal(struct.unpack('!I', v[:4])[0] - 1721424))),
+	(lambda v: isinstance(v, date), lambda v: struct.pack('!I', v.toordinal() + 1721424), lambda v: (4, date.fromordinal(struct.unpack('!I', v[:4])[0] - 1721424))), # from julian date
 ]
 """
 List of (check function, serialize function, deserialize function)
