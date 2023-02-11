@@ -1,3 +1,38 @@
+## 1.1.0 (2023-02-11)
+
+### Feat
+
+- Implemented datetime serialization
+- Implemented date serialization
+- Implemented time serialization
+- Added decimal number serialization with decimal places
+- Added whole decimal serialization
+- Implemented long number serialization
+- Better integer tests
+- Added float serialization
+- Implemented number serialization
+- Added string fallback
+- Added byte serialization
+- Added string serialization
+- Added boolean serialization
+- Implemented deserialization
+- Added support for new serialization
+- Match sentinel inside of database
+
+### Fix
+
+- Fixed packing long numbers
+- Fixed string deserialization
+
+### Refactor
+
+- Replaced serialization method
+- Preparing to decimal serialization
+- Better text tests
+- Better string serialization
+- Using loop without break
+- Using big endian (network)
+
 ## 1.0.2 (2022-12-26)
 
 ### Fix
