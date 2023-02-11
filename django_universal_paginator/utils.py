@@ -36,7 +36,7 @@ def serialize_short_string(v: str) -> bytes:
 
 def deserialize_short_string(v: bytes) -> tuple:
 	length = v[0] + 64
-	text = v[1:].decode('utf-8')
+	text = v[1:length + 1].decode('utf-8')
 	return length + 1, text
 
 
@@ -57,7 +57,7 @@ def serialize_long_string(v: str) -> bytes:
 
 def deserialize_long_string(v: bytes) -> tuple:
 	length = struct.unpack('!H', v[:2])[0] + 320
-	return length + 2, v[2:].decode('utf-8')
+	return length + 2, v[2:length + 2].decode('utf-8')
 
 
 def is_bytes(v) -> bool:
