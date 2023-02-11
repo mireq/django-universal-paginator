@@ -44,16 +44,16 @@ class TestPageConverter(TestCase):
 	def test_cursor_to_pyton(self):
 		converter = CursorPageConverter()
 		self.assertEqual(1, converter.to_python('')) # empty
-		self.assertEqual('abc', converter.to_python('abc'))
+		self.assertEqual('nabc', converter.to_python('nabc'))
 
 	def test_cursor_to_url(self):
 		converter = CursorPageConverter()
 		self.assertEqual('', converter.to_url('')) # empty
 		self.assertEqual('', converter.to_url(1)) # first page ommited
-		self.assertEqual('abc/', converter.to_url('abc'))
+		self.assertEqual('nabc/', converter.to_url('nabc'))
 
 	def test_cursor_urlconf(self):
-		self.assertEqual('/cursor/abc/', reverse('cursor_page', kwargs={'page': 'abc'}))
+		self.assertEqual('/cursor/nabc/', reverse('cursor_page', kwargs={'page': 'nabc'}))
 
 
 class TestUtils(TestCase):
