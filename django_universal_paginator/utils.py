@@ -25,7 +25,7 @@ class SerializationError(RuntimeError):
 	pass
 
 
-def is_short_string(v):
+def is_short_string(v) -> bool:
 	return isinstance(v, str) and len(v) < 256
 
 
@@ -39,7 +39,7 @@ def deserialize_short_string(v: bytes) -> tuple:
 	return length + 1, text
 
 
-def is_long_string(v):
+def is_long_string(v) -> bool:
 	if not isinstance(v, str):
 		return False
 	if len(v) > (65535+256):
@@ -57,12 +57,28 @@ def deserialize_long_string(v: bytes) -> tuple:
 	return length + 2, v[2:].decode('utf-8')
 
 
+def is_bytes(v) -> bool:
+	return isinstance(v, bytes)
+
+
+def serialize_bytes(v: bytes) -> bytes:
+	if len(v) > 65535:
+		raise SerializationError("Bytes value too long")
+	return struct.pack('H', len(v)) + v
+
+
+def deserialize_bytes(v: bytes) -> tuple:
+	length = struct.unpack('H', v[:2])[0]
+	return length + 2, v[2:]
+
+
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
 	(lambda v: v is False, lambda v: b'', lambda v: (0, False)),
 	(is_short_string, serialize_short_string, deserialize_short_string),
 	(is_long_string, serialize_long_string, deserialize_long_string),
+	(is_bytes, serialize_bytes, deserialize_bytes),
 ]
 """
 List of (check function, serialize function, deserialize function)

@@ -426,3 +426,14 @@ class TestSerializer(TestCase):
 		text = 'x' * (65536 + 256) # too long
 		with self.assertRaises(SerializationError):
 			serialize_values([text])
+
+	def test_serialize_bytes(self):
+		text = b'x' * 500
+		val = serialize_values([text])
+		deserialized = deserialize_values(val)
+		self.assertEqual(len(text) + 3, len(val))
+		self.assertEqual([text], deserialized)
+
+		text = b'x' * 65536 # too long
+		with self.assertRaises(SerializationError):
+			serialize_values([text])
