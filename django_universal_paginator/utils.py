@@ -81,11 +81,9 @@ def integer_serializer(size_idx):
 
 	max_val = 0
 	subtract = 0
-	for step in sizes:
+	for step in sizes[:size_idx + 1]:
 		subtract = max_val
 		max_val += (256 ** step)
-		if step == size:
-			break
 
 	if negative:
 		max_val += 1
