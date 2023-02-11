@@ -4,6 +4,7 @@ import json
 import logging
 from copy import deepcopy
 
+from django.db.models import Case, When, Value as V
 from django.core.paginator import InvalidPage, Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q, F
@@ -208,6 +209,21 @@ def filter_by_order_key(qs, direction, start_position):
 	if q:
 		try:
 			qs = qs.filter(q)
+
+			# mark item which matches start position
+			sentinel_query = {
+				order_expression.expression.name: start
+				for order_expression, start
+				in zip(order_by, start_position)
+			}
+			is_sentinel = Case(
+				When(Q(**sentinel_query), then=V(True)),
+				default=V(False)
+			)
+			sentinel_annotation = {
+				constants.SENTINEL_NAME: is_sentinel
+			}
+			qs = qs.annotate(**sentinel_annotation)
 		except Exception:
 			raise InvalidPage()
 

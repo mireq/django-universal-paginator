@@ -48,13 +48,11 @@ class IteratorWrapper(object):
 		cache = list(self.iterator)
 		start_key = self.paginator.get_start_order_key(self.page.number)
 
-		if start_key is not None:
-			# first item handling (used to check previous page existence)
-			if cache and utils.values_to_order_key(self.paginator.get_order_key(cache[0])) == start_key.values:
-				if start_key.direction == constants.KEY_BACK:
-					self.page.next_page_item = cache.pop(0)
-				else:
-					self.page.prev_page_item = cache.pop(0)
+		if self.page.number is not None and cache and getattr(cache[0], constants.SENTINEL_NAME):
+			if start_key.direction == constants.KEY_BACK:
+				self.page.next_page_item = cache.pop(0)
+			else:
+				self.page.prev_page_item = cache.pop(0)
 
 		# last item handling (used to check previous page existence)
 		if len(cache) > self.paginator.per_page:
