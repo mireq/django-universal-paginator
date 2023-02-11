@@ -567,3 +567,10 @@ class TestSerializer(TestCase):
 		deserialized = deserialize_values(val)
 		self.assertEqual(22, len(val))
 		self.assertEqual([str(data[0])], deserialized)
+
+	def test_serialize_float(self):
+		data = [0.1]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(9, len(val))
+		self.assertEqual(data, deserialized)

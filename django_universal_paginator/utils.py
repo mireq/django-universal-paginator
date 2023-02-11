@@ -126,6 +126,7 @@ VALUE_SERIALIZERS = [
 	integer_serializer(-3), # four bytes negative
 	integer_serializer(4), # eight bytes positive
 	integer_serializer(-4), # eight bytes negative
+	(lambda v: isinstance(v, float), lambda v: struct.pack('d', v), lambda v: (8, struct.unpack('d', v[:8])[0])),
 ]
 """
 List of (check function, serialize function, deserialize function)
