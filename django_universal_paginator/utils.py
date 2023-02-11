@@ -26,15 +26,16 @@ class SerializationError(RuntimeError):
 
 
 def is_short_string(v) -> bool:
-	return isinstance(v, str) and len(v) < 256
+	return isinstance(v, str) and len(v.encode('utf-8')) < 320
 
 
 def serialize_short_string(v: str) -> bytes:
-	return struct.pack('B', len(v)) + v.encode('utf-8')
+	v = v.encode('utf-8')
+	return struct.pack('B', len(v) - 64) + v
 
 
 def deserialize_short_string(v: bytes) -> tuple:
-	length = v[0]
+	length = v[0] + 64
 	text = v[1:].decode('utf-8')
 	return length + 1, text
 
@@ -42,18 +43,20 @@ def deserialize_short_string(v: bytes) -> tuple:
 def is_long_string(v) -> bool:
 	if not isinstance(v, str):
 		return False
-	if len(v) > (65535+256):
+	v = v.encode('utf-8')
+	if len(v) > (65535+320):
 		raise SerializationError("String value too long")
 	return True
 
 
 def serialize_long_string(v: str) -> bytes:
-	length = len(v) - 256
-	return struct.pack('!H', length) + v.encode('utf-8')
+	v = v.encode('utf-8')
+	length = len(v) - 320
+	return struct.pack('!H', length) + v
 
 
 def deserialize_long_string(v: bytes) -> tuple:
-	length = struct.unpack('!H', v[:2])[0] + 256
+	length = struct.unpack('!H', v[:2])[0] + 320
 	return length + 2, v[2:].decode('utf-8')
 
 
@@ -171,6 +174,10 @@ def get_order_key(obj, order_by):
 
 
 def serialize_value(value) -> bytes:
+	if isinstance(value, str) and len(value.encode('utf-8')) < 64:
+		value = value.encode('utf-8')
+		return struct.pack('B', 192 + len(value)) + value
+
 	for i, serializer in enumerate(VALUE_SERIALIZERS):
 		checker, serializer, __ = serializer
 		if checker(value):
@@ -186,10 +193,15 @@ def deserialize_values(data: bytes) -> list:
 	values = []
 	while data:
 		data_type, data = data[0], data[1:]
-		consumed, value = VALUE_SERIALIZERS[data_type][2](data)
-		if consumed:
-			data = data[consumed:]
-		values.append(value)
+		if data_type >= 192:
+			string_length = data_type - 192
+			values.append(data[:string_length].decode('utf-8'))
+			data = data[string_length:]
+		else:
+			consumed, value = VALUE_SERIALIZERS[data_type][2](data)
+			if consumed:
+				data = data[consumed:]
+			values.append(value)
 	return values
 
 

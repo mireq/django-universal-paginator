@@ -411,7 +411,25 @@ class TestSerializer(TestCase):
 		self.assertEqual(value_list, deserialized)
 
 	def test_serialize_text(self):
-		text = 'hello'
+		text = 'hello 😼'
+		val = serialize_values([text])
+		deserialized = deserialize_values(val)
+		self.assertEqual(len(text.encode('utf-8')) + 1, len(val))
+		self.assertEqual([text], deserialized)
+
+		text = 'x' * 63 # one byte for size enough
+		val = serialize_values([text])
+		deserialized = deserialize_values(val)
+		self.assertEqual(len(text) + 1, len(val))
+		self.assertEqual([text], deserialized)
+
+		text = 'x' * 64 # this needs second byte for size
+		val = serialize_values([text])
+		deserialized = deserialize_values(val)
+		self.assertEqual(len(text) + 2, len(val))
+		self.assertEqual([text], deserialized)
+
+		text = 'x' * (63 + 256) # max for two bytes
 		val = serialize_values([text])
 		deserialized = deserialize_values(val)
 		self.assertEqual(len(text) + 2, len(val))
@@ -420,10 +438,10 @@ class TestSerializer(TestCase):
 		text = 'x' * 256
 		val = serialize_values([text])
 		deserialized = deserialize_values(val)
-		self.assertEqual(len(text) + 3, len(val))
+		self.assertEqual(len(text) + 2, len(val))
 		self.assertEqual([text], deserialized)
 
-		text = 'x' * (65536 + 256) # too long
+		text = 'x' * (65536 + 320) # too long
 		with self.assertRaises(SerializationError):
 			serialize_values([text])
 
@@ -565,7 +583,7 @@ class TestSerializer(TestCase):
 		data = [18446744078004584704]
 		val = serialize_values(data)
 		deserialized = deserialize_values(val)
-		self.assertEqual(22, len(val))
+		self.assertEqual(21, len(val))
 		self.assertEqual([str(data[0])], deserialized)
 
 	def test_serialize_float(self):
