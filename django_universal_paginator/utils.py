@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
+	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
+	(lambda v: v is False, lambda v: b'', lambda v: (0, False)),
 ]
 """
 List of (check function, serialize function, deserialize function)

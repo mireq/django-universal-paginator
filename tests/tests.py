@@ -401,3 +401,11 @@ class TestSerializer(TestCase):
 
 		deserialized = deserialize_values(val)
 		self.assertEqual([None, None], deserialized)
+
+	def test_serialize_bool(self):
+		value_list = [True, False]
+
+		val = serialize_values(value_list)
+		self.assertEqual(2, len(val)) # single byte for boolean
+		deserialized = deserialize_values(val)
+		self.assertEqual(value_list, deserialized)
