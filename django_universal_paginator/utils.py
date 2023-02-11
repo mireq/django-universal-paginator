@@ -72,6 +72,47 @@ def deserialize_bytes(v: bytes) -> tuple:
 	return length + 2, v[2:]
 
 
+def integer_serializer(size_idx):
+	negative = size_idx < 0
+	size_idx = abs(size_idx) - 1
+	sizes = [1, 2, 4, 8]
+	size = sizes[size_idx]
+	formats = ['B', '!H', '!I', '!Q']
+
+	max_val = 0
+	subtract = 0
+	for step in sizes:
+		subtract = max_val
+		max_val += (256 ** step)
+		if step == size:
+			break
+
+	if negative:
+		max_val += 1
+
+	def match(val):
+		if not isinstance(val, int):
+			return False
+		if negative:
+			val = -val
+		return val >= 0 and val < max_val
+
+	def serialize(val):
+		val = val
+		if negative:
+			val = -val - 1
+		return struct.pack(formats[size_idx], val - subtract)
+
+	def deserialize(val):
+		val = struct.unpack(formats[size_idx], val[:size])[0] + subtract
+		if negative:
+			val = -val - 1
+		return size, val
+
+	return (match, serialize, deserialize)
+
+
+
 VALUE_SERIALIZERS = [
 	(lambda v: v is None, lambda v: b'', lambda v: (0, None)),
 	(lambda v: v is True, lambda v: b'', lambda v: (0, True)),
@@ -79,6 +120,14 @@ VALUE_SERIALIZERS = [
 	(is_short_string, serialize_short_string, deserialize_short_string),
 	(is_long_string, serialize_long_string, deserialize_long_string),
 	(is_bytes, serialize_bytes, deserialize_bytes),
+	integer_serializer(1), # one_byte
+	integer_serializer(-1), # one_byte negative
+	integer_serializer(2), # two bytes positive
+	integer_serializer(-2), # two bytes negative
+	integer_serializer(3), # four bytes positive
+	integer_serializer(-3), # four bytes negative
+	integer_serializer(4), # eight bytes positive
+	integer_serializer(-4), # eight bytes negative
 ]
 """
 List of (check function, serialize function, deserialize function)

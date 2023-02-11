@@ -448,3 +448,122 @@ class TestSerializer(TestCase):
 		val = serialize_values([UnknownObject()])
 		deserialized = deserialize_values(val)
 		self.assertEqual([text], deserialized)
+
+	def test_serialize_integer(self):
+		data = [0]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(2, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max single byte value
+		data = [255]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(2, len(val))
+		self.assertEqual(data, deserialized)
+
+		# negative
+		data = [-1]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(2, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max negative
+		data = [-256]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(2, len(val))
+		self.assertEqual(data, deserialized)
+
+		# two bytes required
+		data = [256]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(3, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max two byte value
+		data = [65791]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(3, len(val))
+		self.assertEqual(data, deserialized)
+
+		# two bytes required negative
+		data = [-257]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(3, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max two bytes required negative
+		data = [-65792]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(3, len(val))
+		self.assertEqual(data, deserialized)
+
+		# four byte value
+		data = [65792]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(5, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max four byte value
+		data = [4295033087]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(5, len(val))
+		self.assertEqual(data, deserialized)
+
+		# four byte negative value
+		data = [-65793]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(5, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max four byte negative value
+		data = [-4295033088]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(5, len(val))
+		self.assertEqual(data, deserialized)
+
+		# eight byte value
+		data = [4295033088]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(9, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max eight byte value
+		data = [18446744078004584703]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(9, len(val))
+		self.assertEqual(data, deserialized)
+
+		# eight byte negative value
+		data = [-4295033089]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(9, len(val))
+		self.assertEqual(data, deserialized)
+
+		# max eight byte negative value
+		data = [-18446744078004584704]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(9, len(val))
+		self.assertEqual(data, deserialized)
+
+		# string as fallback
+		data = [18446744078004584704]
+		val = serialize_values(data)
+		deserialized = deserialize_values(val)
+		self.assertEqual(22, len(val))
+		self.assertEqual([str(data[0])], deserialized)
