@@ -20,10 +20,10 @@ class CursorPage(Page):
 	last_item = None
 
 	def has_next(self):
-		return self.next_page_item is not None
+		return self.next_page_item is not None and self.last_item is not None
 
 	def has_previous(self):
-		return self.prev_page_item is not None
+		return self.prev_page_item is not None and self.first_item is not None
 
 	def next_page_number(self):
 		page_desc = self.url_encode_order_key(self.paginator.get_order_key(self.last_item))
