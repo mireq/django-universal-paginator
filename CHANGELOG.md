@@ -1,3 +1,10 @@
+## 1.2.0 (2023-04-16)
+
+### Feat
+
+- Added example with values_list
+- Added pagination using values_list
+
 ## 1.1.3 (2023-04-08)
 
 ### Fix
