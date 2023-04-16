@@ -301,7 +301,15 @@ class TestCursorPaginator(TestCase):
 		self.assertBookPage([], qs)
 
 	def test_paginate(self):
+		self.runPaginationTest(False)
+
+	def test_paginate_values(self):
+		self.runPaginationTest(True)
+
+	def runPaginationTest(self, use_values: bool = False):
 		books = Book.objects.order_by('pk')
+		if use_values:
+			books = books.values('pk')
 		paginator, page, qs, __ = paginate_cursor_queryset(books, None, 2)
 		# not needed
 		self.assertEqual(0, paginator.count)
@@ -357,7 +365,7 @@ class TestCursorPaginator(TestCase):
 		self.assertBookPage([1, 2], qs)
 
 	def assertBookPage(self, ids, qs):
-		returned_pages = [obj.pk for obj in qs]
+		returned_pages = [obj['pk'] if isinstance(obj, dict) else obj.pk for obj in qs]
 		self.assertEqual(ids, returned_pages)
 
 
