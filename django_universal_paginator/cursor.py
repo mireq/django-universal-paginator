@@ -43,12 +43,18 @@ class IteratorWrapper(object):
 		self.paginator = paginator
 		self.page = page
 
+	def _get_sentinel(self, obj):
+		if isinstance(obj, dict):
+			return obj[constants.SENTINEL_NAME]
+		else:
+			return getattr(obj, constants.SENTINEL_NAME)
+
 	@cached_property
 	def _result_cache(self):
 		cache = list(self.iterator)
 		start_key = self.paginator.get_start_order_key(self.page.number)
 
-		if self.page.number is not None and cache and getattr(cache[0], constants.SENTINEL_NAME):
+		if self.page.number is not None and cache and self._get_sentinel(cache[0]):
 			if start_key.direction == constants.KEY_BACK:
 				self.page.next_page_item = cache.pop(0)
 			else:

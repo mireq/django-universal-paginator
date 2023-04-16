@@ -269,6 +269,8 @@ def get_model_attribute(obj, attribute):
 	"""
 	Get model attribute by traversing attributes by django path like review__book
 	"""
+	if isinstance(obj, dict):
+		return obj[attribute]
 	for lookup in attribute.split(LOOKUP_SEP):
 		obj = getattr(obj, lookup)
 	return obj
