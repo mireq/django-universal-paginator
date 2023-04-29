@@ -10,7 +10,7 @@
 		<div class="pagination top">{% block pagination_top %}{% pagination %}{% endblock %}</div>
 		<ul class="items">
 			{% for object in object_list %}
-				<li>{% if object.name %}{{ object.name }}{% else %}{{ object }}{% endif %}</li>
+				<li>{% if object.id %}{{ object.id }}. {% endif %}{% if object.name %}{{ object.name }}{% else %}{{ object }}{% endif %}</li>
 			{% endfor %}
 		</ul>
 		<div class="pagination bottom">{% block pagination_bottom %}{% pagination %}{% endblock %}</div>
