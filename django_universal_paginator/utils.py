@@ -7,7 +7,7 @@ from decimal import Decimal as D
 from typing import Union
 
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import Case, When, Value as V, Q, F
+from django.db.models import Q, F
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy
 from django.http import Http404
@@ -400,10 +400,7 @@ def filter_by_order_key(qs, direction, start_position):
 
 	# create chain of rule rule for example for name="x" parent=1, id=2 will be following:
 	# name > 'x' OR name = 'x' AND parent > 1 OR name = 'x' AND parent = 1 AND id >= 2
-	for i, value in enumerate(zip(order_by, start_position)):
-		# unpack values
-		order_expression, value = value
-
+	for order_expression, value in zip(order_by, start_position):
 		# filter by
 		field_name = order_expression.expression.name
 
