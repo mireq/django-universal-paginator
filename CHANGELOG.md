@@ -1,3 +1,14 @@
+## 1.3.0 (2023-04-29)
+
+### Feat
+
+- Added row numbers to example list
+
+### Refactor
+
+- Removed unused code
+- Removed first item check, it's not needed
+
 ## 1.2.0 (2023-04-16)
 
 ### Feat
