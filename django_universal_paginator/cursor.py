@@ -14,16 +14,16 @@ OrderKeyFilter = namedtuple('OrderKeyFilter', ['direction', 'values'])
 
 
 class CursorPage(Page):
-	next_page_item = None
-	prev_page_item = None
+	next_page_item = False
+	prev_page_item = False
 	first_item = None
 	last_item = None
 
 	def has_next(self):
-		return self.next_page_item is not None and self.last_item is not None
+		return self.next_page_item and self.last_item is not None
 
 	def has_previous(self):
-		return self.prev_page_item is not None and self.first_item is not None
+		return self.prev_page_item and self.first_item is not None
 
 	def next_page_number(self):
 		page_desc = self.url_encode_order_key(self.paginator.get_order_key(self.last_item))
@@ -43,29 +43,24 @@ class IteratorWrapper(object):
 		self.paginator = paginator
 		self.page = page
 
-	def _get_sentinel(self, obj):
-		if isinstance(obj, dict):
-			return obj[constants.SENTINEL_NAME]
-		else:
-			return getattr(obj, constants.SENTINEL_NAME)
-
 	@cached_property
 	def _result_cache(self):
 		cache = list(self.iterator)
 		start_key = self.paginator.get_start_order_key(self.page.number)
 
-		if self.page.number is not None and cache and self._get_sentinel(cache[0]):
+		if self.page.number is not None and cache:
 			if start_key.direction == constants.KEY_BACK:
-				self.page.next_page_item = cache.pop(0)
+				self.page.next_page_item = True
 			else:
-				self.page.prev_page_item = cache.pop(0)
+				self.page.prev_page_item = True
 
 		# last item handling (used to check previous page existence)
 		if len(cache) > self.paginator.per_page:
+			cache.pop()
 			if start_key is not None and start_key.direction == constants.KEY_BACK:
-				self.page.prev_page_item = cache.pop()
+				self.page.prev_page_item = True
 			else:
-				self.page.next_page_item = cache.pop()
+				self.page.next_page_item = True
 
 		# revert backwards iterated queryset
 		if start_key is not None and start_key.direction == constants.KEY_BACK:
@@ -104,7 +99,7 @@ class CursorPaginator(Paginator):
 	def page(self, number):
 		order_key_filter = self.validate_number(number)
 		page = CursorPage(None, order_key_filter, self)
-		count = self.per_page + (2 if order_key_filter else 1) # load one more item before and after list
+		count = self.per_page + 1 # load one more item before and after list
 		qs = self.object_list
 		if order_key_filter:
 			qs = utils.filter_by_order_key(qs, order_key_filter.direction, order_key_filter.values)

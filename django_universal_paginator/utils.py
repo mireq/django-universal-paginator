@@ -404,9 +404,6 @@ def filter_by_order_key(qs, direction, start_position):
 		# unpack values
 		order_expression, value = value
 
-		# last tieration
-		is_last = i == len(order_by) - 1
-
 		# filter by
 		field_name = order_expression.expression.name
 
@@ -434,8 +431,6 @@ def filter_by_order_key(qs, direction, start_position):
 		else:
 			# smaller or greater
 			direction = 'lt' if order_expression.descending else 'gt'
-			if is_last: # change > to >= and < to <= on last iteration
-				direction = f'{direction}e'
 
 			# construct field lookup
 			field_lookup = f'{field_name}__{direction}'
@@ -464,21 +459,6 @@ def filter_by_order_key(qs, direction, start_position):
 	if q:
 		try:
 			qs = qs.filter(q)
-
-			# mark item which matches start position
-			sentinel_query = {
-				order_expression.expression.name: start
-				for order_expression, start
-				in zip(order_by, start_position)
-			}
-			is_sentinel = Case(
-				When(Q(**sentinel_query), then=V(True)),
-				default=V(False)
-			)
-			sentinel_annotation = {
-				constants.SENTINEL_NAME: is_sentinel
-			}
-			qs = qs.annotate(**sentinel_annotation)
 		except Exception:
 			raise InvalidPage()
 

@@ -216,7 +216,7 @@ class TestUtils(TestCase):
 			if backwards:
 				books.reverse()
 			ids = list(book.pk for book in books)
-			expect_ids = ids
+			expect_ids = ids[1:]
 			next_book = ids[0]
 			debug_books = '\n'.join(str(book) for book in books)
 
@@ -228,7 +228,7 @@ class TestUtils(TestCase):
 				expect_ids = ids[1:]
 				if len(ids) < 2:
 					break
-				next_book = ids[1]
+				next_book = ids[0]
 
 		def check_filters(order_by):
 			check_filter(order_by)
