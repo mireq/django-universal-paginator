@@ -1,3 +1,9 @@
+## 1.4.0 (2023-09-12)
+
+### Feat
+
+- Added async cursor pagination support
+
 ## 1.3.0 (2023-04-29)
 
 ### Feat
