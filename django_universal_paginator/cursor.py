@@ -96,7 +96,7 @@ class CursorPaginator(Paginator):
 	def raise_invalid_page_format(self):
 		raise InvalidPage(gettext("Invalid page format"))
 
-	def page(self, number):
+	def __page(self, number):
 		order_key_filter = self.validate_number(number)
 		page = CursorPage(None, order_key_filter, self)
 		count = self.per_page + 1 # load one more item before and after list
@@ -106,10 +106,21 @@ class CursorPaginator(Paginator):
 		qs = qs[:count]
 		qs._iterable_class = partial(IteratorWrapper, qs._iterable_class, self, page)
 		page.object_list = qs
-		# force initialization
+		return qs, page
+
+	def page(self, number):
+		qs, page = self.__page(number)
 		try:
 			next(iter(qs))
 		except StopIteration:
+			pass
+		return page
+
+	async def apage(self, number):
+		qs, page = self.__page(number)
+		try:
+			await anext(aiter(qs))
+		except StopAsyncIteration:
 			pass
 		return page
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, time, date
+from decimal import Decimal as D
 
 from django.core.paginator import InvalidPage
 from django.db.models import F
@@ -7,12 +8,11 @@ from django.http import Http404
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from decimal import Decimal as D
 
 from .models import Book, BookOrdered, Review
 from django_universal_paginator import constants
 from django_universal_paginator.converter import PageConverter, CursorPageConverter
-from django_universal_paginator.cursor import paginate_cursor_queryset, CursorPaginateMixin
+from django_universal_paginator.cursor import paginate_cursor_queryset, CursorPaginateMixin, CursorPaginator
 from django_universal_paginator.utils import paginate_queryset, get_model_attribute, get_order_key, url_encode_order_key, url_decode_order_key, get_order_by, invert_order_by, convert_to_order_by, convert_order_by_to_expressions, filter_by_order_key, serialize_value, serialize_values, deserialize_values, SerializationError
 
 
@@ -299,6 +299,17 @@ class TestCursorPaginator(TestCase):
 		self.assertFalse(page.has_previous())
 		self.assertFalse(page.has_next())
 		self.assertBookPage([], qs)
+
+	async def test_async(self):
+		qs = Book.objects.order_by('pk')
+		paginator = CursorPaginator(qs, 2)
+		page = await paginator.apage(None)
+		self.assertBookPage([1, 2], page.object_list)
+
+		qs = Book.objects.order_by('pk').none()
+		paginator = CursorPaginator(qs, 2)
+		page = await paginator.apage(None)
+		self.assertBookPage([], page.object_list)
 
 	def test_paginate(self):
 		self.runPaginationTest(False)
