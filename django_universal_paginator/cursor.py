@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 from collections import namedtuple
 from functools import partial
 
@@ -116,13 +117,14 @@ class CursorPaginator(Paginator):
 			pass
 		return page
 
-	async def apage(self, number):
-		qs, page = self.__page(number)
-		try:
-			await anext(aiter(qs))
-		except StopAsyncIteration:
-			pass
-		return page
+	if sys.version_info >= (3, 10): # pragma: no branch py-lt-310
+		async def apage(self, number):
+			qs, page = self.__page(number)
+			try:
+				await anext(aiter(qs)) # pylint: disable=undefined-variable
+			except StopAsyncIteration:
+				pass
+			return page
 
 	@cached_property
 	def count(self):

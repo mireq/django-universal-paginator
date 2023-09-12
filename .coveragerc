@@ -1,0 +1,6 @@
+[coverage:run]
+plugins =
+  coverage_conditional_plugin
+[coverage:coverage_conditional_plugin]
+rules =
+  "sys_version_info < (3, 10)": py-lt-310

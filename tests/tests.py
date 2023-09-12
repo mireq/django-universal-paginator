@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+import unittest
 from datetime import datetime, time, date
 from decimal import Decimal as D
 
@@ -300,6 +302,7 @@ class TestCursorPaginator(TestCase):
 		self.assertFalse(page.has_next())
 		self.assertBookPage([], qs)
 
+	@unittest.skipIf(sys.version_info < (3, 10), "not supported before python 3.10")
 	async def test_async(self):
 		qs = Book.objects.order_by('pk')
 		paginator = CursorPaginator(qs, 2)
